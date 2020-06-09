@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using Roommates.Models;
 using Roommates.Repositories;
 
@@ -16,12 +17,30 @@ namespace Roommates
         static void Main(string[] args)
         {
 
-            //roomRepo is where you store things as RoomInsert and get all method
-            RoomRepository roomRepo = new RoomRepository(CONNECTION_STRING);
+
+            RoommateRepository roommateRepo = new RoommateRepository(CONNECTION_STRING);
+
+            Console.WriteLine("Getting All Roomates:");
+            Console.WriteLine();
+
+            List<Roommate> allRoommates = roommateRepo.GetAll();
+
+            foreach (Roommate roommate in allRoommates)
+            {
+                Console.WriteLine($"{roommate.Id} {roommate.FirstName} {roommate.LastName} {roommate.RentPortion} {roommate.MoveInDate} {roommate.Room}");
+            }
+
+         
 
             Console.WriteLine("Getting All Rooms:");
             Console.WriteLine();
 
+            Console.WriteLine("----------------------------");
+            Console.WriteLine("Getting Room with Id 1");
+
+            Roommate singleRoommate = roommateRepo.GetById(1);
+
+            Console.WriteLine($"{singleRoommate.Id} {singleRoommate.FirstName} {singleRoommate.LastName}");
 
 
             //program will make a connection to the database, run the query, bring data back, turn into Room objects, and then
@@ -51,40 +70,40 @@ namespace Roommates
             //will save it to the database
             //we set the id inside the insert method
 
-            roomRepo.Insert(bathroom);
-          //  roomRepo.Insert(lavatory);
+          //  roomRepo.Insert(bathroom);
+          ////  roomRepo.Insert(lavatory);
 
-            Console.WriteLine("-------------------------------");
-            Console.WriteLine($"Added the new Room with id {bathroom.Id}");
+          //  Console.WriteLine("-------------------------------");
+          //  Console.WriteLine($"Added the new Room with id {bathroom.Id}");
 
-            Console.WriteLine("-------------------------------");
-            Console.WriteLine($"Updating Room with id {bathroom.Id}");
+          //  Console.WriteLine("-------------------------------");
+          //  Console.WriteLine($"Updating Room with id {bathroom.Id}");
 
-            Room updatedBathroom = new Room
-            {
-                Name = "Washroom",
-                MaxOccupancy = 15,
-                Id = bathroom.Id
+          //  Room updatedBathroom = new Room
+          //  {
+          //      Name = "Washroom",
+          //      MaxOccupancy = 15,
+          //      Id = bathroom.Id
                
-            };
+          //  };
 
-            roomRepo.Update(updatedBathroom);
+          //  roomRepo.Update(updatedBathroom);
 
-           roomRepo.Delete(8);
-            roomRepo.Delete(10);
-            roomRepo.Delete(11);
-            roomRepo.Delete(12);
-            roomRepo.Delete(16);
-            roomRepo.Delete(17);
-            roomRepo.Delete(18);
-            roomRepo.Delete(19);
-            roomRepo.Delete(20);
+          // roomRepo.Delete(8);
+          //  roomRepo.Delete(10);
+          //  roomRepo.Delete(11);
+          //  roomRepo.Delete(12);
+          //  roomRepo.Delete(16);
+          //  roomRepo.Delete(17);
+          //  roomRepo.Delete(18);
+          //  roomRepo.Delete(19);
+          //  roomRepo.Delete(20);
 
-            allRooms = roomRepo.GetAll();
+          //  allRooms = roomRepo.GetAll();
 
-            foreach (Room room in allRooms)
-            {
-                Console.WriteLine($"{room.Id} {room.Name} {room.MaxOccupancy}");
+          //  foreach (Room room in allRooms)
+          //  {
+          //      Console.WriteLine($"{room.Id} {room.Name} {room.MaxOccupancy}");
             }
         }
     }
