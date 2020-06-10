@@ -8,7 +8,7 @@ namespace Roommates.Repositories
 
     public class RoommateRepository : BaseRepository
     {
-     
+
 
 
         public RoommateRepository(string connectionString) : base(connectionString) { }
@@ -49,7 +49,7 @@ namespace Roommates.Repositories
 
                     // Execute the SQL in the database and get a "reader" that will give us access to the data.
                     //Take the sql that is above and send it to the database/ then the database executes that query for us
-                 
+
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     // A list to hold the roommates we retrieve from the databae
@@ -60,7 +60,7 @@ namespace Roommates.Repositories
                     //the purpose is to read the data from our result set and create a room
                     while (reader.Read())
                     {
-                      
+
                         //Ordinal is the column. Have to get the number of the column
                         //The get the data
                         //reader.GetOrdinal("ID") is giving the value of that column
@@ -68,7 +68,7 @@ namespace Roommates.Repositories
 
                         int idColumnPosition = reader.GetOrdinal("Id");
 
-                        
+
                         int idValue = reader.GetInt32(idColumnPosition);
 
                         int FirstnameColumnPosition = reader.GetOrdinal("FirstName");
@@ -136,7 +136,7 @@ namespace Roommates.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT FirstName, LastName, RentPortion, MoveInDate, RoomId FROM Roomate WHERE Id = @id";
+                    cmd.CommandText = "SELECT FirstName, LastName, RentPortion, MoveInDate, RoomId FROM Roommate WHERE Id = @id";
                     cmd.Parameters.AddWithValue("@id", id);
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -145,12 +145,12 @@ namespace Roommates.Repositories
                     // If we only expect a single row back from the database, we don't need a while loop.
                     if (reader.Read())
                     {
-                         roommate = new Roommate
+                        roommate = new Roommate
                         {
                             Id = id,
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            RentPortion = reader.GetInt32(reader.GetOrdinal("MaxOccupancy")),
+                            RentPortion = reader.GetInt32(reader.GetOrdinal("RentPortion")),
                             MoveInDate = reader.GetDateTime(reader.GetOrdinal("MoveInDate")),
                             Room = null
 
@@ -163,129 +163,52 @@ namespace Roommates.Repositories
                     return roommate;
                 }
             }
-      }
-
-
-        //public List<Roommate> GetAllWithRoom (int RoomId)
-        //{
-        //    using (SqlConnection conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (SqlCommand cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = @"SELECT 
-        //                                roomate.FirstName,
-        //                                roomate.LastName
-        //                                room.Name
-        //                                From Roomate roomate
-        //                                Join Room room ON roommate.RoomId = room.Id
-        //                                WHERE roomate.roomId = {roomId}
-        //                                MaxOccupancy FROM Room WHERE Id = @id";
-        //            cmd.Parameters.AddWithValue("@id", id);
-        //            SqlDataReader reader = cmd.ExecuteReader();
-
-        //            Room room = null;
-
-        //            // If we only expect a single row back from the database, we don't need a while loop.
-        //            if (reader.Read())
-        //            {
-        //                room = new Room
-        //                {
-        //                    Id = id,
-        //                    Name = reader.GetString(reader.GetOrdinal("Name")),
-        //                    MaxOccupancy = reader.GetInt32(reader.GetOrdinal("MaxOccupancy")),
-        //                };
-        //            }
-
-        //            reader.Close();
-
-        //            return room;
-        //        }
-        //    }
-        //}
-
-        public void Insert(Room room)
-        {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    // These SQL parameters are annoying. Why can't we use string interpolation?
-                    // ... sql injection attacks!!!
-                    //telling the databse to insert a Room into the room database
-
-
-                    //creating the rooms into the table
-                    //id is automatically generated
-                    //insert values into these two colums Name and Max
-                    //Output line is getting the id
-                    //Setting the values
-                    //this is saving a room record or id/value pairs into the table
-                    cmd.CommandText = @"INSERT INTO Room (Name, MaxOccupancy) 
-                                              OUTPUT INSERTED.Id 
-                                              VALUES (@name, @maxOccupancy)"; //
-
-
-                    //referencing the Name of the room properrty (room.Name)
-                    //thats the value that we want to insert
-                    //the sql argument has to match the same name in our insert statement
-                    //@name refers to name of the room
-
-                    cmd.Parameters.AddWithValue("@name", room.Name);
-                    cmd.Parameters.AddWithValue("@maxOccupancy", room.MaxOccupancy);
-
-                    //cmd is our command object and Execute is the connection the database
-
-                    //Scalar is a term that means an individual/single value
-                    //when we call ExecuteScalar we get an integer back which is the id that was just inserted
-                    int id = (int)cmd.ExecuteScalar();
-
-                    room.Id = id;
-                }
-            }
-
-            // when this method is finished we can look in the database and see the new room.
         }
 
-        /// <summary>
-        ///  Updates the room
-        /// </summary>
-        public void Update(Room room)
+
+        public List<Roommate> GetAllWithRoom(int roomId)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"UPDATE Room
-                                    SET Name = @name,
-                                        MaxOccupancy = @maxOccupancy
-                                    WHERE Id = @id";
-                    cmd.Parameters.AddWithValue("@name", room.Name);
-                    cmd.Parameters.AddWithValue("@maxOccupancy", room.MaxOccupancy);
-                    cmd.Parameters.AddWithValue("@id", room.Id);
+                    cmd.CommandText = @$"SELECT 
+                                        roommate.FirstName,
+                                        roommate.LastName
+                                        room.Name
+                                        From Roommate roommate
+                                        Join Room room ON roommate.RoomId = room.Id
+                                        WHERE roommate.roomId = {roomId}";
 
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
+                    SqlDataReader reader = cmd.ExecuteReader();
 
-        /// <summary>
-        ///  Delete the room with the given id
-        /// </summary>
-        public void Delete(int id)
-        {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "DELETE FROM Room WHERE Id = @id";
-                    cmd.Parameters.AddWithValue("@id", id);
-                    cmd.ExecuteNonQuery();
-                }
-            }
+                    List<Roommate> roommateRoom = new List<Roommate>();
+                    // If we only expect a single row back from the database, we don't need a while loop.
+                    while (reader.Read())
+                    {
+                        Roommate eachRoommate = new Roommate
+                        {
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            Room = new Room()
+
+                            {
+                                Id = roomId,
+                                Name = reader.GetString(reader.GetOrdinal("Name"))
+                            }
+                        };
+
+                        roommateRoom.Add(eachRoommate);
+                    }
+
+                reader.Close();
+                return roommateRoom;
+                };
+
+             
         }
     }
+
+}
 }

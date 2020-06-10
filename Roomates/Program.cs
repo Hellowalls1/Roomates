@@ -43,28 +43,37 @@ namespace Roommates
             Console.WriteLine($"{singleRoommate.Id} {singleRoommate.FirstName} {singleRoommate.LastName}");
 
 
+
+            Console.WriteLine("----------------");
+            List<Roommate> roommatesInRoom = roommateRepo.GetAllWithRoom(1);
+
+            foreach(Roommate roommate in roommatesInRoom)
+            {
+                Console.WriteLine($"{roommate.FirstName} {roommate.LastName} {roommate.Room.Name}");
+            }
+
             //program will make a connection to the database, run the query, bring data back, turn into Room objects, and then
             //return it to us so we can iterate over it and return the information on lines 28-31
 
-            List<Room> allRooms = roomRepo.GetAll();
+            //List<Room> allRooms = roomRepo.GetAll();
 
-            foreach (Room room in allRooms)
-            {
-                Console.WriteLine($"{room.Id} {room.Name} {room.MaxOccupancy}");
-            }
+            //foreach (Room room in allRooms)
+            //{
+            //    Console.WriteLine($"{room.Id} {room.Name} {room.MaxOccupancy}");
+            //}
 
 
-            Room bathroom = new Room
-            {
-                Name = "Bathroom",
-                MaxOccupancy = 3
-            };
+            //Room bathroom = new Room
+            //{
+            //    Name = "Bathroom",
+            //    MaxOccupancy = 3
+            //};
 
-            Room lavatory = new Room
-            {
-                Name = "Lavatory",
-                MaxOccupancy = 12
-            };
+            //Room lavatory = new Room
+            //{
+            //    Name = "Lavatory",
+            //    MaxOccupancy = 12
+            //};
 
             //passing bathroom into rooms repository opjecct
             //will save it to the database
@@ -107,4 +116,3 @@ namespace Roommates
             }
         }
     }
-}
